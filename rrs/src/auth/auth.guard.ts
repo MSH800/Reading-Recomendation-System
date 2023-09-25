@@ -41,7 +41,8 @@ export class AuthGuard implements CanActivate {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      const user = await this.userService.findByID(payload.userid);
+      const user = await this.userService.findByID(payload.sub);
+
       if (!user.status) {
         throw new NotFoundException('No user Found');
       }

@@ -5,7 +5,9 @@ import { UsersModule } from './users/users.module';
 import { BooksModule } from './books/books.module';
 import { IntervalsModule } from './intervals/intervals.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { APP_PIPE } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common/pipes';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -20,8 +22,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     UsersModule,
     BooksModule,
     IntervalsModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    },
+    
+  ],
 })
 export class AppModule {}

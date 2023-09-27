@@ -5,22 +5,23 @@ export class User {
   @PrimaryGeneratedColumn()
   userid: number;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: false, unique: true, length: 255 })
   username: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: false, unique: true, length: 255 })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 255 })
   password: string;
 
   @Column({
     type: 'enum',
+    enumName: 'roles',
     enum: ['user', 'admin'],
     default: 'user',
     nullable: false,
   })
-  role: UserRoleType;
+  role: string;
 }
 
 export type UserRoleType = 'admin' | 'user';

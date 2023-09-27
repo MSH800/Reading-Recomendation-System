@@ -18,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
       password: '718653',
       database: 'reading_recomendation_system',
       autoLoadEntities: true,
+      synchronize: true,
     }),
     UsersModule,
     BooksModule,
@@ -36,7 +37,6 @@ import { AuthModule } from './auth/auth.module';
         transform: true,
       }),
     },
-    
   ],
 })
 export class AppModule {}

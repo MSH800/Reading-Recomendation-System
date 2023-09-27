@@ -4,7 +4,7 @@ import {
   Get,
   Post,
   Body,
-  Put,
+  Patch,
   Param,
   Delete,
   Query,
@@ -25,32 +25,37 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Roles('findall')
+  @Roles('findAllUsers')
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @Roles('findById')
   @Get(':id')
   findOneById(@Param('id') id: string) {
     return this.usersService.findByID(+id);
   }
 
+  @Roles('findByUsername')
   @Get('/username/u')
-  findOneByUsername(@Query('username') username: string) {
+  findOneByUsername(@Body('username') username: string) {
     return this.usersService.findByUsername(username);
   }
 
+  @Roles('findByEmail')
   @Get('/email/e')
-  findOne(@Query('email') email: string) {
+  findOne(@Body('email') email: string) {
     return this.usersService.findByEmail(email);
   }
 
-  @Put(':id')
+  @Roles('updateUser')
+  @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @Roles('deleteUser')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

@@ -2,6 +2,8 @@
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 export class UserRepository extends Repository<User> {
   constructor(
@@ -15,47 +17,60 @@ export class UserRepository extends Repository<User> {
     );
   }
 
-  public async createUser(user: any) {
+  public async createUser(createUserDto: CreateUserDto) {
     try {
-      return await this.UsersRepository.save(user);
+      const user = await this.UsersRepository.create(createUserDto);
+      if (user) {
+        await this.UsersRepository.save(user);
+        return { status: 1, data: user, msg: 'user created' };
+      }
+      return { status: 0, data: null, msg: 'user creation error' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 
-  public async updateUser(id: number, user: any) {
+  public async updateUser(id: number, updateUserDto: UpdateUserDto) {
     try {
-      user = await this.UsersRepository.update({ userid: id }, user);
-      if (user.affected) {
-        return { status: 1, data: user };
+      let user = (await this.findById(id)).data;
+      if (user) {
+        if (updateUserDto.username) {
+          user['username'] = updateUserDto.username;
+        }
+        if (updateUserDto.email) {
+          user['email'] = updateUserDto.email;
+        }
+        user = await this.UsersRepository.save(user);
+        return { status: 1, data: user, msg: 'user updated' };
       }
-      return { status: 0, data: 'user not found' };
+      return { status: 0, data: null, msg: 'no user found' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 
   public async deleteUser(id: number) {
     try {
-      const user = await this.UsersRepository.delete({ userid: id });
-      if (user.affected) {
-        return { status: 1, data: user };
+      const user = (await this.findById(id)).data;
+      if (user) {
+        await this.UsersRepository.remove(user);
+        return { status: 1, data: user, msg: 'user deleed' };
       }
-      return { status: 0, data: 'user not found' };
+      return { status: 0, data: null, msg: 'no user found' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 
   public async findAll() {
     try {
       const users = await this.UsersRepository.find();
-      if (users) {
-        return { status: 1, data: users };
+      if (users.length) {
+        return { status: 1, data: users, msg: 'users found' };
       }
-      return { status: 0, data: 'user not found' };
+      return { status: 1, data: [], msg: 'no users found' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 
@@ -63,11 +78,11 @@ export class UserRepository extends Repository<User> {
     try {
       const user = await this.UsersRepository.findOneBy({ userid: id });
       if (user) {
-        return { status: 1, data: user };
+        return { status: 1, data: user, msg: 'user found' };
       }
-      return { status: 0, data: 'user not found' };
+      return { status: 1, data: null, msg: 'no user found' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 
@@ -77,11 +92,11 @@ export class UserRepository extends Repository<User> {
         where: { username: username },
       });
       if (user) {
-        return { status: 1, data: user };
+        return { status: 1, data: user, msg: 'user found' };
       }
-      return { status: 0, data: 'user not found' };
+      return { status: 1, data: null, msg: 'no user found' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 
@@ -91,11 +106,11 @@ export class UserRepository extends Repository<User> {
         where: { email: email },
       });
       if (user) {
-        return { status: 1, data: user };
+        return { status: 1, data: user, msg: 'user found' };
       }
-      return { status: 0, data: 'user not found' };
+      return { status: 1, data: null, msg: 'no user found' };
     } catch (err) {
-      return { status: 0, data: err };
+      return { status: 0, data: null, msg: err };
     }
   }
 }

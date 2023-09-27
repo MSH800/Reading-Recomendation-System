@@ -28,5 +28,26 @@ export class RolesGuard implements CanActivate {
       return admin_access.includes(endpoint);
     }
     return user_access.includes(endpoint);
+
+    //   if (role == 'admin') {
+    //     const check = admin_access.includes(endpoint);
+    //     if (check) {
+    //       return check;
+    //     }
+    //     return {
+    //       status: 0,
+    //       data: null,
+    //       msg: 'Unauthorized access for user of type admin',
+    //     };
+    //   }
+    //   const check = user_access.includes(endpoint);
+    //   if (check) {
+    //     return check;
+    //   }
+    //   return {
+    //     status: 0,
+    //     data: null,
+    //     msg: 'Unauthorized access for user of type user',
+    //   };
   }
 }

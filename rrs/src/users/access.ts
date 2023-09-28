@@ -12,6 +12,8 @@ export const admin_access = [
   'findBookById',
   'updateBook',
   'deleteBook',
+  'top5Books',
+  'intervals',
 ];
 
 export const user_access = [
@@ -24,4 +26,6 @@ export const user_access = [
   'deleteUser',
   'findAllBooks',
   'findBookById',
+  'top5Books',
+  'intervals',
 ];

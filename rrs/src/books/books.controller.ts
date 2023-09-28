@@ -29,6 +29,12 @@ export class BooksController {
     return this.booksService.findAll();
   }
 
+  @Roles('top5Books')
+  @Get('/top5')
+  top5() {
+    return this.booksService.top5();
+  }
+
   @Roles('findBookById')
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {

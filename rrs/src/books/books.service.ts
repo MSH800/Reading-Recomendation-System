@@ -11,7 +11,7 @@ export class BooksService {
       if (createBookDto['num_of_read_pages'] > createBookDto['num_of_pages']) {
         return {
           status: 0,
-          data: {},
+          data: null,
           msg: 'num_of_read_pages can not be > num_of_pages',
         };
       }
@@ -21,6 +21,10 @@ export class BooksService {
 
   findAll() {
     return this.bookRepository.findAll();
+  }
+
+  top5() {
+    return this.bookRepository.top5();
   }
 
   findOne(id: number) {
@@ -33,5 +37,9 @@ export class BooksService {
 
   remove(id: number) {
     return this.bookRepository.deleteBook(id);
+  }
+
+  updateByInterval(id: number, intervals: any[]) {
+    return this.bookRepository.updateByIntervals(id, intervals);
   }
 }

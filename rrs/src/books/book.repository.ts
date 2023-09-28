@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { Interval } from 'src/intervals/entities/interval.entity';
 
 export class BookRepository extends Repository<Book> {
   constructor(
@@ -31,7 +32,24 @@ export class BookRepository extends Repository<Book> {
 
   public async findAll() {
     try {
-      const books = await this.BooksRepository.find();
+      const books = await this.BooksRepository.find({});
+      if (books.length) {
+        return { status: 1, data: books, msg: 'books found' };
+      }
+      return { status: 0, data: [], msg: 'no books found' };
+    } catch (err) {
+      return { status: 0, data: null, msg: err };
+    }
+  }
+
+  public async top5() {
+    try {
+      const books = await this.BooksRepository.createQueryBuilder('b')
+        .select('*')
+        .from(Book, 'book')
+        .orderBy('book.num_of_read_pages', 'DESC')
+        .limit(5)
+        .execute();
       if (books.length) {
         return { status: 1, data: books, msg: 'books found' };
       }
@@ -107,5 +125,53 @@ export class BookRepository extends Repository<Book> {
     } catch (err) {
       return { status: 0, data: null, msg: err };
     }
+  }
+
+  public updateByIntervals(book_id: number, intervals: any[]) {
+    console.log(intervals);
+    if (intervals.length) {
+      const start = [intervals[0].start_page];
+      const end = [intervals[0].end_page];
+      for (let i = 1; i < intervals.length; i++) {
+        const nstart_page = intervals[i].start_page;
+        const nend_page = intervals[i].end_page;
+        for (let j = 0; j < start.length; j++) {
+          if (nstart_page > end[j]) {
+            start.push(nstart_page);
+            end.push(nend_page);
+            break;
+          } else if (nstart_page <= end[j]) {
+            if (end[j] < nend_page) {
+              end[j] = nend_page;
+            }
+          }
+        }
+      }
+      const pages = this.comp_uniq_pages(start, end);
+      // console.log(pages);
+      // console.log(start);
+      // console.log(end);
+      this.updateBook(book_id, { num_of_read_pages: pages });
+      return { status: 0, data: pages, msg: 'num_of_read_pages computed' };
+    }
+    const start = [];
+    const end = [];
+    const pages = this.comp_uniq_pages(start, end);
+    // console.log(pages);
+    // console.log(start);
+    // console.log(end);
+    this.updateBook(book_id, { num_of_read_pages: pages });
+    return { status: 0, data: pages, msg: 'num_of_read_pages computed' };
+  }
+
+  comp_uniq_pages(start: number[], end: number[]) {
+    let p = 0;
+    for (let i = 0; i < start.length; i++) {
+      const sp = start[i];
+      const ep = end[i];
+      const exp = ep - sp + 1;
+      p = p + exp;
+    }
+    return p;
   }
 }

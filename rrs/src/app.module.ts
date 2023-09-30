@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common/pipes';
 import { AuthModule } from './auth/auth.module';
+import { isUser } from './validations/isUser';
+import { isBook } from './validations/isBook';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -28,6 +30,8 @@ import { AuthModule } from './auth/auth.module';
   controllers: [AppController],
   providers: [
     AppService,
+    isUser,
+    isBook,
 
     {
       provide: APP_PIPE,

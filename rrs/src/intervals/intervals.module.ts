@@ -7,8 +7,12 @@ import { IntervalRepository } from './interval.repository';
 import { BooksModule } from 'src/books/books.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Interval]), BooksModule],
+  imports: [
+    TypeOrmModule.forFeature([Interval]),
+    forwardRef(() => BooksModule),
+  ],
   controllers: [IntervalsController],
   providers: [IntervalsService, IntervalRepository],
+  exports: [IntervalsService],
 })
 export class IntervalsModule {}

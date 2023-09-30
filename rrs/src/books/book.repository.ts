@@ -4,11 +4,14 @@ import { Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { Interval } from 'src/intervals/entities/interval.entity';
+import { IntervalsService } from 'src/intervals/intervals.service';
+import { Inject, forwardRef } from '@nestjs/common';
 
 export class BookRepository extends Repository<Book> {
   constructor(
     @InjectRepository(Book) private readonly BooksRepository: Repository<Book>,
+    @Inject(forwardRef(() => IntervalsService))
+    private readonly intervalsService: IntervalsService,
   ) {
     super(
       BooksRepository.target,
@@ -26,7 +29,7 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: null, msg: 'book creation error' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
@@ -38,7 +41,7 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: [], msg: 'no books found' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
@@ -55,7 +58,7 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: [], msg: 'no books found' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
@@ -67,7 +70,7 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: null, msg: 'no book found' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
@@ -81,7 +84,7 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: null, msg: 'no book found' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
@@ -93,15 +96,39 @@ export class BookRepository extends Repository<Book> {
           book['book_name'] = updateBookDto.book_name;
         }
         if (updateBookDto.num_of_pages) {
+          const intervals = (
+            await this.intervalsService.findByBookwithConId(id)
+          ).data;
+          let check = false;
+          if (intervals) {
+            intervals.forEach((interval) => {
+              if (interval.end_page > updateBookDto.num_of_pages) {
+                check = true;
+                return;
+              }
+            });
+          }
+          if (check) {
+            return {
+              status: 0,
+              data: null,
+              msg: 'book intervals contain an interval with an end_page > num_of_pages',
+            };
+          }
           book['num_of_pages'] = updateBookDto.num_of_pages;
         }
-        if (updateBookDto.num_of_read_pages) {
+
+        if (
+          updateBookDto.num_of_read_pages ||
+          updateBookDto.num_of_read_pages == 0
+        ) {
           book['num_of_read_pages'] = updateBookDto.num_of_read_pages;
         }
+
         if (book['num_of_read_pages'] > book['num_of_pages']) {
           return {
             status: 0,
-            data: {},
+            data: null,
             msg: 'num_of_read_pages cannot be > num_of_pages',
           };
         }
@@ -110,7 +137,7 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: null, msg: 'no book found' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
@@ -123,13 +150,13 @@ export class BookRepository extends Repository<Book> {
       }
       return { status: 0, data: null, msg: 'no book found' };
     } catch (err) {
-      return { status: 0, data: null, msg: err };
+      return { status: 0, data: null, msg: err + ' ' };
     }
   }
 
   public updateByIntervals(book_id: number, intervals: any[]) {
     console.log(intervals);
-    if (intervals.length) {
+    if (intervals) {
       const start = [intervals[0].start_page];
       const end = [intervals[0].end_page];
       for (let i = 1; i < intervals.length; i++) {
@@ -148,20 +175,12 @@ export class BookRepository extends Repository<Book> {
         }
       }
       const pages = this.comp_uniq_pages(start, end);
-      // console.log(pages);
-      // console.log(start);
-      // console.log(end);
       this.updateBook(book_id, { num_of_read_pages: pages });
       return { status: 0, data: pages, msg: 'num_of_read_pages computed' };
     }
-    const start = [];
-    const end = [];
-    const pages = this.comp_uniq_pages(start, end);
-    // console.log(pages);
-    // console.log(start);
-    // console.log(end);
-    this.updateBook(book_id, { num_of_read_pages: pages });
-    return { status: 0, data: pages, msg: 'num_of_read_pages computed' };
+    console.log(0);
+    this.updateBook(book_id, { num_of_read_pages: 0 });
+    return { status: 0, data: 0, msg: 'num_of_read_pages computed' };
   }
 
   comp_uniq_pages(start: number[], end: number[]) {

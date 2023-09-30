@@ -5,11 +5,13 @@ import { Interval } from './entities/interval.entity';
 import { CreateIntervalDto } from './dto/create-interval.dto';
 import { UpdateIntervalDto } from './dto/update-interval.dto';
 import { BooksService } from 'src/books/books.service';
+import { Inject, forwardRef } from '@nestjs/common';
 
 export class IntervalRepository extends Repository<Interval> {
   constructor(
     @InjectRepository(Interval)
     private readonly IntervalsRepository: Repository<Interval>,
+    @Inject(forwardRef(() => BooksService))
     private readonly booksService: BooksService,
   ) {
     super(
@@ -23,6 +25,21 @@ export class IntervalRepository extends Repository<Interval> {
     try {
       let interval = await this.IntervalsRepository.create(createIntervalDto);
       if (interval) {
+        const book = await this.booksService.findOne(interval.book_id);
+        if (book.data.num_of_pages < interval.start_page) {
+          return {
+            status: 0,
+            data: null,
+            msg: 'start_page can not be > book num_of_pages',
+          };
+        }
+        if (book.data.num_of_pages < interval.end_page) {
+          return {
+            status: 0,
+            data: null,
+            msg: 'end_page can not be > book num_of_pages',
+          };
+        }
         interval = await this.IntervalsRepository.save(interval);
         if (interval) {
           const intervals = (await this.findByBookIdWithCon(interval.book_id))
@@ -43,7 +60,7 @@ export class IntervalRepository extends Repository<Interval> {
       if (intervals.length) {
         return { status: 1, data: intervals, msg: 'intervals found' };
       }
-      return { status: 0, data: [], msg: 'no intervals found' };
+      return { status: 0, data: null, msg: 'no intervals found' };
     } catch (err) {
       return { status: 0, data: null, msg: err };
     }
@@ -131,8 +148,23 @@ export class IntervalRepository extends Repository<Interval> {
         if (interval['end_page'] < interval['start_page']) {
           return {
             status: 0,
-            data: {},
+            data: null,
             msg: 'end_page cannot be < start_page',
+          };
+        }
+        const book = await this.booksService.findOne(interval.book_id);
+        if (book.data.num_of_pages < interval.start_page) {
+          return {
+            status: 0,
+            data: null,
+            msg: 'start_page can not be > book num_of_pages',
+          };
+        }
+        if (book.data.num_of_pages < interval.end_page) {
+          return {
+            status: 0,
+            data: null,
+            msg: 'end_page can not be > book num_of_pages',
           };
         }
         interval = await this.IntervalsRepository.save(interval);

@@ -68,7 +68,7 @@ export class UserRepository extends Repository<User> {
       if (users.length) {
         return { status: 1, data: users, msg: 'users found' };
       }
-      return { status: 1, data: [], msg: 'no users found' };
+      return { status: 0, data: null, msg: 'no users found' };
     } catch (err) {
       return { status: 0, data: null, msg: err };
     }
@@ -80,7 +80,7 @@ export class UserRepository extends Repository<User> {
       if (user) {
         return { status: 1, data: user, msg: 'user found' };
       }
-      return { status: 1, data: null, msg: 'no user found' };
+      return { status: 0, data: null, msg: 'no user found' };
     } catch (err) {
       return { status: 0, data: null, msg: err };
     }
@@ -94,7 +94,7 @@ export class UserRepository extends Repository<User> {
       if (user) {
         return { status: 1, data: user, msg: 'user found' };
       }
-      return { status: 1, data: null, msg: 'no user found' };
+      return { status: 0, data: null, msg: 'no user found' };
     } catch (err) {
       return { status: 0, data: null, msg: err };
     }
@@ -108,7 +108,7 @@ export class UserRepository extends Repository<User> {
       if (user) {
         return { status: 1, data: user, msg: 'user found' };
       }
-      return { status: 1, data: null, msg: 'no user found' };
+      return { status: 0, data: null, msg: 'no user found' };
     } catch (err) {
       return { status: 0, data: null, msg: err };
     }

@@ -34,8 +34,9 @@ $ npm install
 
 ## Running the app
 
-1- install dep.
-2- create .env file with following parameters
+1- cd rrs
+2- install dep.
+3- create .env file with following parameters
 DB_HOST=localhost
 DB_PORT=5432
 DB_UN=postgres
@@ -43,7 +44,7 @@ DB_PS=718653
 DB_DB=reading_recomendation_system
 SK=secret
 EX=10m
-3-run app
+4-run app
 
 ```bash
 # development

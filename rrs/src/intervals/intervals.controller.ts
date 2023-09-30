@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { IntervalsService } from './intervals.service';
 import { CreateIntervalDto } from './dto/create-interval.dto';
@@ -19,8 +20,8 @@ export class IntervalsController {
   constructor(private readonly intervalsService: IntervalsService) {}
 
   @Post()
-  create(@Body() createIntervalDto: CreateIntervalDto) {
-    return this.intervalsService.create(createIntervalDto);
+  create(@Body() createIntervalDto: CreateIntervalDto, @Request() req) {
+    return this.intervalsService.create(createIntervalDto, req);
   }
 
   @Get()
@@ -52,12 +53,13 @@ export class IntervalsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateIntervalDto: UpdateIntervalDto,
+    @Request() req,
   ) {
-    return this.intervalsService.update(id, updateIntervalDto);
+    return this.intervalsService.update(id, updateIntervalDto, req);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.intervalsService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.intervalsService.remove(id, req);
   }
 }

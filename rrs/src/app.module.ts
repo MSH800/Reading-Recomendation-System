@@ -10,15 +10,19 @@ import { ValidationPipe } from '@nestjs/common/pipes';
 import { AuthModule } from './auth/auth.module';
 import { isUser } from './validations/isUser';
 import { isBook } from './validations/isBook';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '718653',
-      database: 'reading_recomendation_system',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_UN,
+      password: process.env.DB_PS,
+      database: process.env.DB_DB,
       autoLoadEntities: true,
       synchronize: true,
     }),

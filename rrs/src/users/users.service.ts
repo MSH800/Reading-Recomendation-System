@@ -27,11 +27,25 @@ export class UsersService {
     return this.userRepository.findByEmail(email);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, updateUserDto: UpdateUserDto, req) {
+    if (req['user'].userid != id) {
+      return {
+        status: 0,
+        data: null,
+        msg: 'user in token must match user in params',
+      };
+    }
     return this.userRepository.updateUser(id, updateUserDto);
   }
 
-  remove(id: number) {
+  remove(id: number, req) {
+    if (req['user'].userid != id) {
+      return {
+        status: 0,
+        data: null,
+        msg: 'user in token must match user in params',
+      };
+    }
     return this.userRepository.deleteUser(id);
   }
 }

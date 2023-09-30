@@ -132,10 +132,18 @@ export class IntervalRepository extends Repository<Interval> {
   public async updateInterval(
     id: number,
     updateIntervalDto: UpdateIntervalDto,
+    req,
   ) {
     try {
       let interval = (await this.findById(id)).data;
       if (interval) {
+        if (req['user'].userid != interval.user_id) {
+          return {
+            status: 0,
+            data: null,
+            msg: 'user in token must match user in params',
+          };
+        }
         if (updateIntervalDto.start_page) {
           interval['start_page'] = updateIntervalDto.start_page;
         }
@@ -181,10 +189,17 @@ export class IntervalRepository extends Repository<Interval> {
     }
   }
 
-  public async deleteInterval(id: number) {
+  public async deleteInterval(id: number, req) {
     try {
       let interval = (await this.findById(id)).data;
       if (interval) {
+        if (req['user'].userid != interval.user_id) {
+          return {
+            status: 0,
+            data: null,
+            msg: 'user in token must match user in params',
+          };
+        }
         interval = await this.IntervalsRepository.remove(interval);
         if (interval) {
           const intervals = (await this.findByBookIdWithCon(interval.book_id))

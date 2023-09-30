@@ -6,7 +6,14 @@ import { IntervalRepository } from './interval.repository';
 @Injectable()
 export class IntervalsService {
   constructor(private readonly intervalRepository: IntervalRepository) {}
-  create(createIntervalDto: CreateIntervalDto) {
+  create(createIntervalDto: CreateIntervalDto,req) {
+    if (req['user'].userid != createIntervalDto.user_id){
+      return {
+        status: 0,
+        data: null,
+        msg: 'user in token must match user in params',
+      };
+    }
     if (createIntervalDto['end_page'] < createIntervalDto['start_page']) {
       return {
         status: 0,
@@ -37,11 +44,11 @@ export class IntervalsService {
     return this.intervalRepository.findByBookIdWithCon(id);
   }
 
-  update(id: number, updateIntervalDto: UpdateIntervalDto) {
-    return this.intervalRepository.updateInterval(id, updateIntervalDto);
+  update(id: number, updateIntervalDto: UpdateIntervalDto,req) {
+    return this.intervalRepository.updateInterval(id, updateIntervalDto,req);
   }
 
-  remove(id: number) {
-    return this.intervalRepository.deleteInterval(id);
+  remove(id: number,req) {
+    return this.intervalRepository.deleteInterval(id,req);
   }
 }
